@@ -1,6 +1,15 @@
-# **📡 Projet Radar MIMO 7x8 \- Système d'Acquisition et Traitement**
+# 📡 Projet Radar MIMO 7x8 - Système d'Acquisition et Traitement
 
-Ce répertoire contient l'ensemble des codes sources pour piloter, calibrer et analyser les données d'un radar MIMO (Multiple-Input Multiple-Output) composé de 7 antennes émettrices (Tx) et 8 antennes réceptrices (Rx). Le système est architecturé autour d'un ordinateur LattePanda, contrôlant un VNA, un synthétiseur de fréquence (ADF4351) et un Arduino pour la commutation RF.
+Ce répertoire contient l'ensemble des codes sources pour piloter, calibrer et analyser les données d'un radar MIMO (Multiple-Input Multiple-Output) composé de 7 antennes émettrices (Tx) et 8 antennes réceptrices (Rx).
+
+**Architecture Physique du Système :**
+Le projet est orchestré par un nano-ordinateur **LattePanda** qui synchronise en temps réel trois blocs matériels majeurs :
+
+* **Un Analyseur de Réseau Vectoriel (VNA)** : Chargé de la génération du signal de base (balayage en fréquence) et de la mesure de phase/amplitude du signal reçu (S21).
+
+* **Un Système d'Élévation de Fréquence (Up-conversion)** : Basé sur un synthétiseur de fréquence **ADF4351** agissant comme Oscillateur Local (LO à 4 GHz). Il permet de translater le signal intermédiaire du VNA vers la bande de fréquence micro-onde rayonnée par les antennes.
+
+* **Un Réseau de Commutation Spatiale (Switchs RF)** : Composé de puces HMC321. Ces interrupteurs haute fréquence sont pilotés par les broches numériques du microcontrôleur **Arduino Leonardo** (intégré au LattePanda) pour réaliser le balayage électronique ultra-rapide des 56 combinaisons matérielles (7 émetteurs × 8 récepteurs).
 
 ## **📂 Architecture du Dossier et Description des Fichiers**
 
