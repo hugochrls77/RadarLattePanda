@@ -19,11 +19,12 @@ IF_BAND      = 30000
 PUISSANCE    = 0         
 
 FREQ_ADF_LO  = 4000e6    
-DOSSIER_ADF  = "/home/hc/Bureau/LattePandaLinux/ADF4351/pyadf435x" 
+dossier_script = os.path.dirname(os.path.abspath(__file__))
+DOSSIER_ADF  = os.path.join(dossier_script, "..", "CONFIG", "pyadf435x") 
 
 # Matériel corrigé : Les ports sont maintenant séquentiels de 1 à 7
 PORTS_TX_PHYSIQUES = [1, 2, 3, 4, 5, 6, 7] 
-DOSSIER_CALIB = "Calibration_Master_201pts"
+DOSSIER_CALIB = os.path.join(dossier_script, "Calibration_Dataset")
 
 if not os.path.exists(DOSSIER_CALIB):
     os.makedirs(DOSSIER_CALIB)

@@ -1,15 +1,30 @@
-# 📡 Projet Radar MIMO 7x8 - Système d'Acquisition et Traitement
+# **📡 Projet Radar MIMO 7x8 \- Système d'Acquisition et Traitement**
 
-Ce répertoire contient l'ensemble des codes sources pour piloter, calibrer et analyser les données d'un radar MIMO (Multiple-Input Multiple-Output) composé de 7 antennes émettrices (Tx) et 8 antennes réceptrices (Rx).
-
-**Architecture Physique du Système :**
+Ce répertoire contient l'ensemble des codes sources pour piloter, calibrer et analyser les données d'un radar MIMO (Multiple-Input Multiple-Output) composé de 7 antennes émettrices (Tx) et 8 antennes réceptrices (Rx).  
+**Architecture Physique du Système :**  
 Le projet est orchestré par un nano-ordinateur **LattePanda** qui synchronise en temps réel trois blocs matériels majeurs :
 
-* **Un Analyseur de Réseau Vectoriel (VNA)** : Chargé de la génération du signal de base (balayage en fréquence) et de la mesure de phase/amplitude du signal reçu (S21).
-
-* **Un Système d'Élévation de Fréquence (Up-conversion)** : Basé sur un synthétiseur de fréquence **ADF4351** agissant comme Oscillateur Local (LO à 4 GHz). Il permet de translater le signal intermédiaire du VNA vers la bande de fréquence micro-onde rayonnée par les antennes.
-
+* **Un Analyseur de Réseau Vectoriel (VNA)** : Chargé de la génération du signal de base (balayage en fréquence) et de la mesure de phase/amplitude du signal reçu (S21).  
+* **Un Système d'Élévation de Fréquence (Up-conversion)** : Basé sur un synthétiseur de fréquence **ADF4351** agissant comme Oscillateur Local (LO à 4 GHz). Il permet de translater le signal intermédiaire du VNA vers la bande de fréquence micro-onde rayonnée par les antennes.  
 * **Un Réseau de Commutation Spatiale (Switchs RF)** : Composé de puces HMC321. Ces interrupteurs haute fréquence sont pilotés par les broches numériques du microcontrôleur **Arduino Leonardo** (intégré au LattePanda) pour réaliser le balayage électronique ultra-rapide des 56 combinaisons matérielles (7 émetteurs × 8 récepteurs).
+
+## **⚙️ Installation et Configuration Globale**
+
+Avant de lancer le moindre script, le futur utilisateur doit préparer l'environnement logiciel du PC / LattePanda :
+
+### **1\. Dépendances Python**
+
+Les codes utilisent plusieurs librairies scientifiques et de communication matérielle. Installez-les via votre terminal :  
+pip install numpy matplotlib pyvisa pyserial
+
+### **2\. Configuration Matérielle (À vérifier dans les codes)**
+
+Dans les scripts d'acquisition (radar\_mesure\_1\_frame.py et calibration\_loopback\_...), plusieurs variables globales en haut des fichiers **doivent impérativement être adaptées à la machine cible** :
+
+* **Le port Arduino (PORT\_ARDUINO) :** \* Sous Linux (LattePanda) : Il s'agit souvent de '/dev/ttyACM0' ou '/dev/ttyUSB0'.  
+  * Sous Windows : Il faudra le remplacer par le port équivalent, ex: 'COM3'.  
+* **L'adresse IP du VNA :**  
+  * La ligne rm.open\_resource('TCPIP0::127.0.0.1::5025::SOCKET') utilise actuellement une adresse locale (127.0.0.1). Si le VNA est connecté via un routeur ou un câble Ethernet classique, mettez à jour cette IP.  
 
 ## **📂 Architecture du Dossier et Description des Fichiers**
 

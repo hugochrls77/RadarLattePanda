@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 print("--- VÉRIFICATION DES MESURES DE CALIBRATION (S21) ---")
 
-DOSSIER_CALIB = "Calibration_Master_201pts"
+DOSSIER_CALIB = "Calibration_Dataset"
 
 # Configuration de la fenêtre d'affichage (Grille 2 lignes x 4 colonnes = 8 cases)
 # On partagera les axes X et Y pour faciliter la comparaison visuelle entre les Tx

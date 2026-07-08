@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 print("--- ANALYSE ET VISUALISATION DE LA MATRICE MIMO ---")
 
-FICHIER_DATA = 'matrice_mimo_lattepanda.csv'
+FICHIER_DATA = 'test.csv'
 
 try:
     # 1. Chargement des données brutes

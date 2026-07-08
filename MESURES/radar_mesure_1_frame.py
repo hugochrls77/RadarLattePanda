@@ -14,18 +14,15 @@ PORT_ARDUINO = '/dev/ttyACM0'
 BAUD_RATE    = 115200    
 FREQ_START   = 700e6     
 FREQ_STOP    = 1e9       
-NB_POINTS    = 101        
+NB_POINTS    = 51        
 IF_BAND      = 30000    
 PUISSANCE    = 0         
 
 FREQ_ADF_LO  = 4000e6    
-DOSSIER_ADF  = "/home/hc/Bureau/LattePandaLinux/ADF4351/pyadf435x" 
+CHEMIN_SCRIPT = os.path.dirname(os.path.abspath(__file__))
+DOSSIER_ADF = os.path.join(CHEMIN_SCRIPT, "..", "CONFIG", "pyadf435x")
 
-# --- PATCH MATÉRIEL : MAPPING DES PORTS TX ---
-# L'antenne Tx8 n'existe pas physiquement. 
-# L'antenne Tx7 est branchée sur le port 8 du switch.
-# Le port 7 du switch est laissé vide/déconnecté.
-PORTS_TX_PHYSIQUES = [1, 2, 3, 4, 5, 6, 8] 
+PORTS_TX_PHYSIQUES = [1, 2, 3, 4, 5, 6, 7] 
 
 # ==========================================
 # 2. INITIALISATION DE L'ADF435x
@@ -153,8 +150,10 @@ print(f"\n⏱️ Matrice complète acquise en : {temps_fin - temps_debut:.3f} se
 # 7. SAUVEGARDE ET RESTAURATION
 # ==========================================
 tableau_final = np.vstack(liste_blocs_numpy)
-np.savetxt('set3_vide3.csv', tableau_final, delimiter=',', fmt='%g')
-print("💾 Fichier 'matrice_mimo_lattepanda.csv' généré (Format 7 émetteurs x 8 récepteurs).")
+dossier_courant = os.path.dirname(os.path.abspath(__file__))
+chemin_sauvegarde = os.path.join(dossier_courant, 'mesure_brute_temporaire.csv')
+np.savetxt(chemin_sauvegarde, tableau_final, delimiter=',', fmt='%g')
+print(f"💾 Fichier sauvegardé dans le dossier courant : {chemin_sauvegarde}")
 
 vna.write('SYST:SHOW')
 vna.write('DISPLAY:ENAB ON')
