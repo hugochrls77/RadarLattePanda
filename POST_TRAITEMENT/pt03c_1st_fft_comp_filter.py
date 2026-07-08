@@ -1,19 +1,30 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
-print("--- ÉTAPE 3B : LABORATOIRE DE FENÊTRAGE (WINDOWING) ---")
+print("--- ÉTAPE 3C : LABORATOIRE DE FENÊTRAGE (WINDOWING) ---")
+
+# --- GESTION DES CHEMINS ---
+dossier_courant = os.path.dirname(os.path.abspath(__file__))
+DOSSIER_DATA = os.path.join(dossier_courant, "..", "DATA")
 
 # ==========================================
 # 1. PARAMÈTRES ET CHARGEMENT
 # ==========================================
-NB_FREQS = 401  # On utilise le fichier 201 points pour bien voir l'effet
 NB_VIRTUAL = 56
 C = 3e8
 N_fft_range = 1024*8 
 
 print("Chargement de la matrice...")
-data_cible = np.loadtxt('cible_3m_401pts.csv', delimiter=',')
-data_vide = np.loadtxt('vide_3m_401pts.csv', delimiter=',')
+CHEMIN_CIBLE = os.path.join(DOSSIER_DATA, 'cible_3m_201pts.csv')
+CHEMIN_VIDE = os.path.join(DOSSIER_DATA, 'vide_3m_201pts.csv')
+
+data_cible = np.loadtxt(CHEMIN_CIBLE, delimiter=',')
+data_vide = np.loadtxt(CHEMIN_VIDE, delimiter=',')
+
+# --- DÉTECTION DYNAMIQUE DU NOMBRE DE POINTS ---
+NB_FREQS = len(data_vide) // NB_VIRTUAL
+print(f"✅ Détection automatique : {NB_FREQS} points de fréquence par canal.")
 
 f_start = data_cible[0, 2]
 f_stop = data_cible[NB_FREQS-1, 2]

@@ -1,7 +1,12 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 
 print("--- ÉTAPE 3B : COMPARAISON DES PROFILS DE DISTANCE (CIBLES SEULES) ---")
+
+# --- GESTION DES CHEMINS ---
+dossier_courant = os.path.dirname(os.path.abspath(__file__))
+DOSSIER_DATA = os.path.join(dossier_courant, "..", "DATA")
 
 # ==========================================
 # 1. PARAMÈTRES GLOBAUX
@@ -22,32 +27,27 @@ for nb_pts in resolutions:
     # 2. CHARGEMENT ET PRÉPARATION
     # ==========================================
     # Chargement de la cible uniquement
-    fichier_cible = f'cible_3m_{nb_pts}pts.csv'
+    fichier_cible = os.path.join(DOSSIER_DATA, f'cible_3m_{nb_pts}pts.csv')
     data_cible = np.loadtxt(fichier_cible, delimiter=',')
     
     # --- POUR PLUS TARD : Chargement du vide ---
-    fichier_vide = f'vide_3m_{nb_pts}pts.csv'
+    fichier_vide = os.path.join(DOSSIER_DATA, f'vide_3m_{nb_pts}pts.csv')
     data_vide = np.loadtxt(fichier_vide, delimiter=',')
     S_vide = data_vide[:, 3] + 1j * data_vide[:, 4]
     S_vide_reshape = S_vide.reshape((NB_VIRTUAL, nb_pts))
     # ------------------------------------------
 
-    # Calcul des paramètres de fréquence spécifiques à cette résolution
+    # Calcul des paramètres de fréquence spécifiques
     f_start = data_cible[0, 2]
     f_stop = data_cible[nb_pts-1, 2]
     B = f_stop - f_start
     delta_f = B / (nb_pts - 1)
-
-    # Création de la matrice complexe cible
+    
     S_cible = data_cible[:, 3] + 1j * data_cible[:, 4]
     S_cible_reshape = S_cible.reshape((NB_VIRTUAL, nb_pts))
 
-    # --- POUR PLUS TARD : Soustraction du fond ---
-    S_matrix_net = S_cible_reshape - S_vide_reshape
-    # ---------------------------------------------
-    
-    # Pour l'instant, on travaille directement sur la cible brute
-    S_matrix_work = S_vide_reshape 
+    # Transformée IFFT sur la cible brute
+    S_matrix_work = S_cible_reshape 
 
     # ==========================================
     # 3. TRAITEMENT IFFT (CŒUR DU CODE)
@@ -76,12 +76,10 @@ for nb_pts in resolutions:
 # ==========================================
 # 4. AFFICHAGE DU GRAPHIQUE FINAL
 # ==========================================
-plt.title("Comparaison des Profils de Distance (Différentes résolutions de points)")
-plt.xlabel("Distance apparente (Mètres)")
-plt.ylabel("Partie réelle")
-
-# On limite l'affichage à 25m pour bien superposer les zones de test
-plt.xlim(0, 25) 
+plt.title("Comparaison de la résolution spatiale selon le nombre de points")
+plt.xlabel("Distance (mètres)")
+plt.ylabel("Amplitude S21 (Linéaire)")
+plt.xlim(0, 10)
 plt.grid(True, linestyle='--', alpha=0.7)
 plt.legend()
 plt.tight_layout()

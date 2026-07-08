@@ -1,21 +1,31 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 
 print("--- ÉTAPE 5 : IMAGERIE RADAR 2D (RANGE-ANGLE) ---")
 
-# ==========================================
-# 1. PARAMÈTRES ET CHARGEMENT
-# ==========================================
-NB_FREQS = 201
+# --- GESTION DES CHEMINS ---
+dossier_courant = os.path.dirname(os.path.abspath(__file__))
+DOSSIER_DATA = os.path.join(dossier_courant, "..", "DATA")
+
+# 1. Paramètres physiques
 NB_VIRTUAL = 56
 C = 3e8
 OFFSET_CABLES = 0
 
-data_vide = np.loadtxt('vide_3m_201pts.csv', delimiter=',')
-data_cible = np.loadtxt('cible_3m_201pts.csv', delimiter=',')
+CHEMIN_VIDE = os.path.join(DOSSIER_DATA, 'vide_3m_51pts.csv')
+CHEMIN_CIBLE = os.path.join(DOSSIER_DATA, 'cible_3m_51pts.csv')
 
-f_start = data_cible[0, 2]       
-f_stop = data_cible[NB_FREQS-1, 2] 
+# 2. Chargement et Nettoyage
+data_vide = np.loadtxt(CHEMIN_VIDE, delimiter=',')
+data_cible = np.loadtxt(CHEMIN_CIBLE, delimiter=',')
+
+# --- DÉTECTION DYNAMIQUE DU NOMBRE DE POINTS ---
+NB_FREQS = len(data_vide) // NB_VIRTUAL
+print(f"✅ Détection automatique : {NB_FREQS} points de fréquence par canal.")
+
+f_start = data_cible[0, 2]
+f_stop = data_cible[NB_FREQS-1, 2]
 B = f_stop - f_start
 delta_f = B / (NB_FREQS - 1)
 

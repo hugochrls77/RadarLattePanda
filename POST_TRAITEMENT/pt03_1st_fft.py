@@ -1,17 +1,28 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 
 print("--- ÉTAPE 3 : PROFIL DE DISTANCE (RANGE IFFT) ---")
 
+# --- GESTION DES CHEMINS ---
+dossier_courant = os.path.dirname(os.path.abspath(__file__))
+DOSSIER_DATA = os.path.join(dossier_courant, "..", "DATA")
+
+CHEMIN_VIDE = os.path.join(DOSSIER_DATA, 'vide_3m_51pts.csv')
+CHEMIN_CIBLE = os.path.join(DOSSIER_DATA, 'cible_3m_51pts.csv')
+
 # 1. Paramètres physiques
-NB_FREQS = 51
 NB_VIRTUAL = 56
 C = 3e8
 
 # 2. Chargement et Nettoyage
-print("Chargement des matrices...")
-data_vide = np.loadtxt('vide_3m_51pts.csv', delimiter=',')
-data_cible = np.loadtxt('cible_3m_51pts.csv', delimiter=',')
+print(f"Chargement de {CHEMIN_VIDE}...")
+data_vide = np.loadtxt(CHEMIN_VIDE, delimiter=',')
+data_cible = np.loadtxt(CHEMIN_CIBLE, delimiter=',')
+
+# --- DÉTECTION DYNAMIQUE DU NOMBRE DE POINTS ---
+NB_FREQS = len(data_vide) // NB_VIRTUAL
+print(f"✅ Détection automatique : {NB_FREQS} points de fréquence par canal.")
 
 f_start = data_cible[0, 2]
 f_stop = data_cible[NB_FREQS-1, 2]
@@ -30,20 +41,17 @@ S_cible_reshape = S_cible.reshape((NB_VIRTUAL, NB_FREQS))
 print("Calcul de la Transformée (IFFT)...")
 
 # A. Zero-padding : On "gonfle" artificiellement le vecteur avec des zéros
-# Cela ne crée pas de résolution physique, mais ça lisse la courbe (interpolation temporelle)
-N_fft_range = 512 
+# Cela n'améliore pas la résolution physique, mais "lisse" la courbe d'interpolation
+N_fft_range = 1024 # Puissance de 2 pour la rapidité de la FFT
 
-# B. Fenêtrage (Windowing) : On atténue les bords de la bande passante 
-# pour éviter que les "lobes secondaires" du signal ne masquent d'autres cibles.
-window_range = np.hanning(NB_FREQS) 
+# B. Application d'une fenêtre (Windowing) pour réduire les rebonds (lobes secondaires)
+# On utilise une fenêtre de Blackman qui est excellente pour les signaux radar
+fenetre = np.blackman(NB_FREQS)
 
-# Application de la fenêtre sur chaque ligne (antenne virtuelle)
-S_windowed = S_matrix_net * window_range
-
-# C. Transformée de Fourier Inverse (IFFT) sur l'axe des fréquences (axis=1)
-#range_profile = np.fft.ifft(S_windowed, n=N_fft_range, axis=1)
+# C. La Transformée IFFT (sur l'axe des fréquences, axis=1)
+# On multiplie chaque ligne (antenne) par la fenêtre avant de faire l'IFFT
+range_profile = np.fft.ifft(S_matrix_net * fenetre, n=N_fft_range, axis=1)
 range_profile_raw = np.fft.ifft(S_matrix_net, n=N_fft_range, axis=1)
-range_profile_cible = np.fft.ifft(S_cible_reshape, n=N_fft_range, axis=1)
 range_profile_vide = np.fft.ifft(S_vide_reshape, n=N_fft_range, axis=1)
 
 # D. Création de l'axe X (Distances en mètres)
@@ -63,16 +71,15 @@ plt.figure(figsize=(10, 5))
 
 #plt.plot(distances, profil_0_db, color='gray', linestyle=':', alpha=0.5, label="Antenne Virtuelle 0")
 #plt.plot(distances, profil_55_db, color='gray', linestyle=':', alpha=0.5, label="Antenne Virtuelle 55")
-plt.plot(distances, np.real(range_profile_raw[28, :]), color='orange', linewidth=2, label="Signal différence")
-plt.plot(distances, np.real(range_profile_cible[28, :]), color='green', linewidth=2, label="Signal cible")
-plt.plot(distances, np.real(range_profile_vide[28, :]), color='red', linewidth=2, label="Signal vide")
+plt.plot(distances, np.real(range_profile_raw[28, :]), color='orange', linewidth=2, label="Signal sans Windowing")
+plt.plot(distances, np.real(range_profile[28, :]), color='blue', linewidth=2, label="Antenne Centrale (Cible Nette)")
 
-plt.title("Profil de Distance 1D (Après Range IFFT)")
-plt.xlabel("Distance apparente (Mètres)")
-plt.ylabel("Puissance (dB)")
-
-# On limite l'affichage aux 8 premiers mètres pour bien voir la pièce
-plt.xlim(0, 25) 
+plt.title(f"Profil de Distance Radar (IFFT) - {NB_FREQS} pts de fréquence")
+plt.xlabel("Distance (mètres)")
+plt.ylabel("Amplitude S21")
+plt.xlim(0, 10) # On zoome sur les 10 premiers mètres
+#plt.ylim(-110, -50)
 plt.grid(True, linestyle='--', alpha=0.7)
 plt.legend()
+plt.tight_layout()
 plt.show()

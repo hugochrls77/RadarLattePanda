@@ -1,16 +1,27 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 print("--- ÉTAPE 4 : VUE GLOBALE DISTANCE-ANTENNES (RANGE IFFT) ---")
 
+# --- GESTION DES CHEMINS ---
+dossier_courant = os.path.dirname(os.path.abspath(__file__))
+DOSSIER_DATA = os.path.join(dossier_courant, "..", "DATA")
+
 # 1. Paramètres physiques
-NB_FREQS = 51
 NB_VIRTUAL = 56
 C = 3e8
 
+CHEMIN_VIDE = os.path.join(DOSSIER_DATA, 'vide_3m_51pts.csv')
+CHEMIN_CIBLE = os.path.join(DOSSIER_DATA, 'cible_3m_51pts.csv')
+
 # 2. Chargement et Nettoyage
-data_vide = np.loadtxt('vide_3m_51pts.csv', delimiter=',')
-data_cible = np.loadtxt('cible_3m_51pts.csv', delimiter=',')
+data_vide = np.loadtxt(CHEMIN_VIDE, delimiter=',')
+data_cible = np.loadtxt(CHEMIN_CIBLE, delimiter=',')
+
+# --- DÉTECTION DYNAMIQUE DU NOMBRE DE POINTS ---
+NB_FREQS = len(data_vide) // NB_VIRTUAL
+print(f"✅ Détection automatique : {NB_FREQS} points de fréquence par canal.")
 
 f_start = data_cible[0, 2]
 f_stop = data_cible[NB_FREQS-1, 2]
